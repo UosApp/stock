@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UosryApp</title>
+    <title>MySQL Data</title>
 </head>
 <body>
     <h1>Submit Data to MySQL</h1>
@@ -32,7 +32,7 @@
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('http://localhost:3001/data');
+                const response = await fetch('https://uosapp.github.io/stock/'); // تغيير المنفذ إلى 3001
                 const data = await response.json();
                 const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
 
