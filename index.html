@@ -1,54 +1,87 @@
-<script>
-    async function fetchData() {
-        try {
-            const response = await fetch('https://your-app-name.herokuapp.com/data');
-            const data = await response.json();
-            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UosryApp</title>
+</head>
+<body>
+    <h1>Submit Data to MySQL</h1>
+    <form id="data-form">
+        <label for="item_id">Item ID:</label>
+        <input type="number" id="item_id" name="item_id" required>
+        <br>
+        <label for="item_nm">Item Name:</label>
+        <input type="text" id="item_nm" name="item_nm" required>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
 
-            tableBody.innerHTML = ''; // Clear the table before adding new data
+    <h1>Data from MySQL</h1>
+    <table id="data-table" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
-            data.forEach(row => {
-                const newRow = tableBody.insertRow();
-                const cell1 = newRow.insertCell(0);
-                const cell2 = newRow.insertCell(1);
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('http://localhost:3001/data');
+                const data = await response.json();
+                const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
 
-                cell1.textContent = row.item_id;
-                cell2.textContent = row.item_nm !== null ? row.item_nm : ''; // Handle null values
-            });
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
+                tableBody.innerHTML = ''; // Clear the table before adding new data
 
-    fetchData();
+                data.forEach(row => {
+                    const newRow = tableBody.insertRow();
+                    const cell1 = newRow.insertCell(0);
+                    const cell2 = newRow.insertCell(1);
 
-    document.getElementById('data-form').addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const item_id = document.getElementById('item_id').value;
-        const item_nm = document.getElementById('item_nm').value;
-
-        try {
-            const response = await fetch('https://your-app-name.herokuapp.com/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ item_id: item_id, item_nm: item_nm })
-            });
-
-            if (response.ok) {
-                document.getElementById('item_id').value = ''; // Clear the input fields
-                document.getElementById('item_nm').value = '';
-                fetchData();  // Refresh data table after submission
-            } else {
-                const errorData = await response.json();
-                console.error('Error submitting data:', errorData);
-                alert('Failed to submit data: ' + errorData.error);
+                    cell1.textContent = row.item_id;
+                    cell2.textContent = row.item_nm !== null ? row.item_nm : ''; // Handle null values
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
-        } catch (error) {
-            console.error('Error submitting data:', error);
-            alert('Failed to submit data: ' + error.message);
         }
-    });
-</script>
+
+        fetchData();
+
+        document.getElementById('data-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const item_id = document.getElementById('item_id').value;
+            const item_nm = document.getElementById('item_nm').value;
+
+            try {
+                const response = await fetch('http://localhost:3001/submit', { // تغيير المنفذ إلى 3001
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ item_id: item_id, item_nm: item_nm })
+                });
+
+                if (response.ok) {
+                    document.getElementById('item_id').value = ''; // Clear the input fields
+                    document.getElementById('item_nm').value = '';
+                    fetchData();  // Refresh data table after submission
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error submitting data:', errorData);
+                    alert('Failed to submit data: ' + errorData.error);
+                }
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                alert('Failed to submit data: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
