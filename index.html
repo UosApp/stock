@@ -1,89 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UosryApp</title>
-</head>
-<body>
-    <h1>Submit Data to MySQL</h1>
-    <form id="data-form">
-        <label for="item_id">Item ID:</label>
-        <input type="number" id="item_id" name="item_id" required>
-        <br>
-        <label for="item_nm">Item Name:</label>
-        <input type="text" id="item_nm" name="item_nm" required>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
+<script>
+    async function fetchData() {
+        try {
+            const response = await fetch('https://your-app-name.herokuapp.com/data');
+            const data = await response.json();
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
 
-    <h1>Data from MySQL</h1>
-    <table id="data-table" border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+            tableBody.innerHTML = ''; // Clear the table before adding new data
 
-    <script>
-        async function fetchData() {
-            try {
-                const response = await fetch('https://uosapp.github.io/stock/data'); // تأكد من العنوان الصحيح
-                const data = await response.json();
-                const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            data.forEach(row => {
+                const newRow = tableBody.insertRow();
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
 
-                tableBody.innerHTML = ''; // Clear the table before adding new data
-
-                data.forEach(row => {
-                    const newRow = tableBody.insertRow();
-                    const cell1 = newRow.insertCell(0);
-                    const cell2 = newRow.insertCell(1);
-
-                    cell1.textContent = row.item_id;
-                    cell2.textContent = row.item_nm !== null ? row.item_nm : ''; // Handle null values
-                });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+                cell1.textContent = row.item_id;
+                cell2.textContent = row.item_nm !== null ? row.item_nm : ''; // Handle null values
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
+    }
 
-        fetchData();
+    fetchData();
 
-        document.getElementById('data-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+    document.getElementById('data-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-            const item_id = document.getElementById('item_id').value;
-            const item_nm = document.getElementById('item_nm').value;
+        const item_id = document.getElementById('item_id').value;
+        const item_nm = document.getElementById('item_nm').value;
 
-            try {
-                const response = await fetch('https://uosapp.github.io/stock/submit', { // تأكد من العنوان الصحيح
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ item_id: item_id, item_nm: item_nm })
-                });
+        try {
+            const response = await fetch('https://your-app-name.herokuapp.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ item_id: item_id, item_nm: item_nm })
+            });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Data submitted successfully:', result);
-                    document.getElementById('item_id').value = ''; // Clear the input fields
-                    document.getElementById('item_nm').value = '';
-                    fetchData();  // Refresh data table after submission
-                } else {
-                    const errorData = await response.json();
-                    console.error('Error submitting data:', errorData);
-                    alert('Failed to submit data: ' + (errorData.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error submitting data:', error);
-                alert('Failed to submit data: ' + error.message);
+            if (response.ok) {
+                document.getElementById('item_id').value = ''; // Clear the input fields
+                document.getElementById('item_nm').value = '';
+                fetchData();  // Refresh data table after submission
+            } else {
+                const errorData = await response.json();
+                console.error('Error submitting data:', errorData);
+                alert('Failed to submit data: ' + errorData.error);
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            console.error('Error submitting data:', error);
+            alert('Failed to submit data: ' + error.message);
+        }
+    });
+</script>
