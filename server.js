@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors'); // إضافة حزمة cors
 const app = express();
-const port = 3001; // تغيير المنفذ إلى 3001
+const port = process.env.PORT || 3001; // استخدام متغير PORT للتعامل مع GitHub Pages
 
 const connection = mysql.createConnection({
   host: 'localhost',
